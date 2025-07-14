@@ -13,14 +13,16 @@ public class LoadDll : MonoBehaviour
 {
     void Start()
     {
-        // Editor环境下，HotUpdate.dll.bytes已经被自动加载，不需要加载，重复加载反而会出问题。
-#if !UNITY_EDITOR
-        Assembly hotUpdateAss = Assembly.Load(File.ReadAllBytes($"{Application.streamingAssetsPath}/HotUpdate.dll.bytes"));
-#else
-        // Editor下无需加载，直接查找获得HotUpdate程序集
-        Assembly hotUpdateAss = System.AppDomain.CurrentDomain.GetAssemblies().First(a => a.GetName().Name == "HotUpdate");
-#endif
+//         // Editor环境下，HotUpdate.dll.bytes已经被自动加载，不需要加载，重复加载反而会出问题。
+// #if !UNITY_EDITOR
+//         Assembly hotUpdateAss = Assembly.Load(File.ReadAllBytes($"{Application.streamingAssetsPath}/HotUpdate.dll.bytes"));
+// #else
+//         // Editor下无需加载，直接查找获得HotUpdate程序集
+//         Assembly hotUpdateAss = System.AppDomain.CurrentDomain.GetAssemblies().First(a => a.GetName().Name == "HotUpdate");
+// #endif
     
+        Assembly hotUpdateAss = Assembly.Load(File.ReadAllBytes($"{Application.streamingAssetsPath}/HotUpdate.dll.bytes"));
+
         Type type = hotUpdateAss.GetType("Hello");
         type.GetMethod("Run").Invoke(null, null);
     }
