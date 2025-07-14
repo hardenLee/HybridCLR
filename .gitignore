@@ -45,3 +45,6 @@ Assets/StreamingAssets.meta
 
 # 忽略根目录 Bundle文件
 Bundles/
+
+# 忽略根目录 HybridCLRData
+HybridCLRData/
