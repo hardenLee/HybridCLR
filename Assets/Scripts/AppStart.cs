@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class AppStart : MonoBehaviour
@@ -28,11 +29,15 @@ public class AppStart : MonoBehaviour
         
         Debug.Log("[AppStart] 启动完成");
         
+        Task task = CodeLoader.Instance().DownloadAsync();
+        while (!task.IsCompleted)
+            yield return null;
         
-        Assembly hotUpdateAss = Assembly.Load(File.ReadAllBytes($"{Application.streamingAssetsPath}/HotUpdate.dll.bytes"));
+        CodeLoader.Instance().LoadHotUpdateAssembly();
 
+
+        Assembly hotUpdateAss = CodeLoader.Instance().GetHotUpdateAssembly();
         Type type = hotUpdateAss.GetType("Hello");
         type.GetMethod("Run").Invoke(null, null);
     }
-
 }

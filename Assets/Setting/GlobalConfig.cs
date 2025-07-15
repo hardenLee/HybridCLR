@@ -6,4 +6,5 @@ using UnityEngine;
 public class GlobalConfig : ScriptableObject
 {
     public OperatingMode operatingMode = OperatingMode.EditorSimulateMode;
+    public bool enableDll = true;
 }

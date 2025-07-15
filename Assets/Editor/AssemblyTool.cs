@@ -38,7 +38,7 @@ public class AssemblyTool
     }
     
     /// <summary> 菜单和快捷键编译按钮 </summary>
-    [MenuItem("Tools/Dll/Compile  HotDll _F6", false)]
+    [MenuItem("Tools/Dll/Compile Update_HotDll _F6", false)]
     static void MenuItemOfCompile()
     {
         // 强制刷新一下，防止关闭auto refresh，文件修改时间不准确
@@ -119,7 +119,7 @@ public class AssemblyTool
     }
     
     /// <summary> 菜单和快捷键编译按钮 </summary>
-    [MenuItem("Tools/Dll/Compile  AotDll _F7", false)]
+    [MenuItem("Tools/Dll/Compile Update_AotDll _F7", false)]
     static void MenuItemOfCompileF7()
     {
         // 强制刷新一下，防止关闭auto refresh，文件修改时间不准确

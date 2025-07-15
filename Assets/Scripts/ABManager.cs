@@ -67,11 +67,11 @@ public class ABManager : SingletonAutoMono<ABManager>
     }
 
     /// <summary> 异步加载资源对象，返回 Task 方式 </summary>
-    public async Task<GameObject> LoadAndInstantiateAsync(string location)
+    public async Task<T> LoadAndInstantiateAsync<T>(string location) where T : UnityEngine.Object
     {
         if (!assetHandles.TryGetValue(location, out OwenHandleBase owenHandle))
         {
-            var yooHandle = package.LoadAssetAsync<GameObject>(location);
+            var yooHandle = package.LoadAssetAsync<T>(location);
             owenHandle = new OwenHandleBase(yooHandle);
             assetHandles.Add(location, owenHandle);
         }
@@ -79,18 +79,43 @@ public class ABManager : SingletonAutoMono<ABManager>
         {
             owenHandle.AddRef();
         }
-        
-        //var handle = package.LoadAssetAsync<GameObject>(location);
+
         await owenHandle.YooHandle.Task;
 
-        var prefab = (owenHandle.YooHandle as AssetHandle)?.AssetObject as GameObject;
-        if (prefab == null)
+        var asset = (owenHandle.YooHandle as AssetHandle)?.AssetObject as T;
+        if (asset == null)
         {
-            Debug.LogError($"LoadAndInstantiateAsync failed: {location} is not a GameObject.");
+            Debug.LogError($"LoadAndInstantiateAsync<{typeof(T).Name}> failed: {location} returned null.");
             return null;
         }
 
-        return Instantiate(prefab);
+        // 如果是 GameObject，则自动实例化
+        if (asset is GameObject prefab)
+        {
+            return GameObject.Instantiate(prefab) as T;
+        }
+
+        // 否则直接返回原资源
+        return asset;
+    }
+    
+    /// <summary>
+    /// 主要用来加载dll config aotdll，因为这时候纤程还没创建，无法使用ResourcesLoaderComponent。
+    /// 游戏中的资源应该使用ResourcesLoaderComponent来加载
+    /// </summary>
+    public async Task<Dictionary<string, T>> LoadAllAssetsAsyncDic<T>(string location) where T : UnityEngine.Object
+    {
+        AllAssetsHandle allAssetsOperationHandle = YooAssets.LoadAllAssetsAsync<T>(location);
+        await allAssetsOperationHandle.Task;
+        Dictionary<string, T> dictionary = new Dictionary<string, T>();
+        foreach (UnityEngine.Object assetObj in allAssetsOperationHandle.AllAssetObjects)
+        {
+            T t = assetObj as T;
+            dictionary.Add(t.name, t);
+        }
+
+        allAssetsOperationHandle.Release();
+        return dictionary;
     }
 
     #endregion
@@ -100,7 +125,7 @@ public class ABManager : SingletonAutoMono<ABManager>
     /// <summary>
     /// 异步加载某个资源包内所有资源（如多个配置表）
     /// </summary>
-    public async Task<List<T>> LoadAllAssetsAsync<T>(string location) where T : UnityEngine.Object
+    public async Task<List<T>> LoadAllAssetsAsyncList<T>(string location) where T : UnityEngine.Object
     {
         var handle = package.LoadAllAssetsAsync<T>(location);
         await handle.Task;
