@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: GlobalConfig
   m_EditorClassIdentifier: 
   operatingMode: 1
+  enableDll: 0

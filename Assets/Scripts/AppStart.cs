@@ -29,7 +29,7 @@ public class AppStart : MonoBehaviour
         
         Debug.Log("[AppStart] 启动完成");
         
-        Task task = CodeLoader.Instance().DownloadAsync();
+        Task task = CodeLoader.Instance().DownloadAsync(globalConfig);
         while (!task.IsCompleted)
             yield return null;
         

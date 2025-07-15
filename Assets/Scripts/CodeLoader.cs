@@ -14,13 +14,9 @@ public class CodeLoader : BaseManager<CodeLoader>
     private Dictionary<string, TextAsset> aotDlls;
     private bool enableDll;
 
-    public void Awake()
+    public async Task DownloadAsync(GlobalConfig globalConfig)
     {
-        enableDll = Resources.Load<GlobalConfig>("GlobalConfig").enableDll;
-    }
-
-    public async Task DownloadAsync()
-    {
+        enableDll = globalConfig.enableDll;
         dlls = await ABManager.Instance().LoadAllAssetsAsyncDic<TextAsset>($"Assets/Bundles/Code/HotUpdate.dll.bytes");
         aotDlls = await ABManager.Instance().LoadAllAssetsAsyncDic<TextAsset>($"Assets/Bundles/AotDlls/mscorlib.dll.bytes");
         Debug.Log("[CodeLoader] 下载dll完成");
@@ -28,16 +24,12 @@ public class CodeLoader : BaseManager<CodeLoader>
 
     public void LoadHotUpdateAssembly()
     {
-        if (!enableDll)
-        {
-            byte[] hotUpdateAssBytes = File.ReadAllBytes(Path.Combine("Assets/Bundles/Code", "HotUpdate.dll.bytes"));
-            hotUpdateAssembly = Assembly.Load(hotUpdateAssBytes);
-        }
+        byte[] hotUpdateAssBytes;
+        if (enableDll)
+            hotUpdateAssBytes = dlls["HotUpdate.dll"].bytes;
         else
-        {
-            byte[] hotUpdateAssBytes = dlls["HotUpdate.dll"].bytes;
-            hotUpdateAssembly = Assembly.Load(hotUpdateAssBytes);
-        }
+            hotUpdateAssBytes = File.ReadAllBytes(Path.Combine("Assets/Bundles/Code", "HotUpdate.dll.bytes"));
+        hotUpdateAssembly = Assembly.Load(hotUpdateAssBytes);
         Debug.Log("[CodeLoader] LoadHotUpdateAssembly完成");
     }
     
